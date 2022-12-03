@@ -1,48 +1,44 @@
 const express = require("express")
-const faker = require("faker")
-
+const UsersService = require("../services/userService")
 const router = express.Router()
 
-router.get("/", (req, res) => {
-  const users = []
-  const { size } = req.query
-  const limit = size || 10
+const service = new UsersService()
 
-  for (let i = 0; i < limit; i++) {
-    users.push({
-      name: faker.name.firstName(),
-      lastName: faker.name.lastName(),
-      job: faker.name.jobArea(),
-    })
-  }
+router.get("/", (req, res) => {
+  const users = service.find()
 
   res.json(users)
 })
 
+router.get("/:id", (req, res) => {
+  const { id } = req.params
+
+  const user = service.findOne(id)
+
+  res.json(user)
+})
+
 router.post("/", (req, res) => {
   const body = req.body
-  res.status(201).json({
-    message: "Posted",
-    data: body,
-  })
+
+  const user = service.create(body)
+
+  res.status(201).json(user)
 })
 
 router.patch("/:id", (req, res) => {
   const { id } = req.params
   const body = req.body
-  res.json({
-    message: "Updated",
-    data: body,
-    id,
-  })
+  const user = service.update(id, body)
+  res.json(user)
 })
 
 router.delete("/:id", (req, res) => {
   const { id } = req.params
-  res.json({
-    message: "Deleted",
-    id,
-  })
+  const user = service.delete(id)
+  res.json(user)
 })
+
+router.get("/filter", (req, res) => res.send("im a filter"))
 
 module.exports = router
