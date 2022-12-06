@@ -4,38 +4,50 @@ const router = express.Router()
 
 const service = new UsersService()
 
-router.get("/", (req, res) => {
-  const users = service.find()
+router.get("/", async (req, res) => {
+  const users = await service.find()
 
   res.json(users)
 })
 
-router.get("/:id", (req, res) => {
-  const { id } = req.params
+router.get("/:id", async (req, res, next) => {
+  try {
+    const { id } = req.params
 
-  const user = service.findOne(id)
+    const user = await service.findOne(id)
 
-  res.json(user)
+    res.json(user)
+  } catch (error) {
+    next(error)
+  }
 })
 
-router.post("/", (req, res) => {
-  const body = req.body
+router.post("/", async (req, res, next) => {
+  try {
+    const body = req.body
 
-  const user = service.create(body)
+    const user = await service.create(body)
 
-  res.status(201).json(user)
+    res.status(201).json(user)
+  } catch (error) {
+    next(error)
+  }
 })
 
-router.patch("/:id", (req, res) => {
-  const { id } = req.params
-  const body = req.body
-  const user = service.update(id, body)
-  res.json(user)
+router.patch("/:id", async (req, res, next) => {
+  try {
+    const { id } = req.params
+    const body = req.body
+    const user = await service.update(id, body)
+    res.json(user)
+  } catch (error) {
+    next(error)
+  }
 })
 
-router.delete("/:id", (req, res) => {
+router.delete("/:id", async (req, res) => {
   const { id } = req.params
-  const user = service.delete(id)
+  const user = await service.delete(id)
   res.json(user)
 })
 
