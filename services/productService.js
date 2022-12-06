@@ -15,6 +15,7 @@ class ProductsService {
         name: faker.commerce.productName(),
         price: parseInt(faker.commerce.price(), 10),
         image: faker.image.imageUrl(),
+        isBlock: faker.datatype.boolean(),
       })
     }
   }
@@ -39,6 +40,7 @@ class ProductsService {
   async findOne(id) {
     const product = this.products.find((item) => item.id === id)
     if (!product) throw boom.notFound("Not found")
+    if (product.isBlock) throw boom.conflict("Product blocked")
     return product
   }
 
