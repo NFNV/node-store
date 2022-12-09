@@ -19,7 +19,7 @@ class UsersService {
     }
   }
 
-  create(data) {
+  async create(data) {
     const newUser = {
       id: faker.datatype.uuid(),
       ...data,
@@ -32,15 +32,16 @@ class UsersService {
     return this.users
   }
 
-  findOne(id) {
-    return this.users.find((item) => item.id === id)
+  async findOne(id) {
+    const user = this.users.find((item) => item.id === id)
+    if (!user) throw boom.notFound("Not found")
+    if (user.isBlock) throw boom.conflict("User blocked")
+    return user
   }
 
-  update(id, changes) {
+  async update(id, changes) {
     const index = this.users.findIndex((item) => item.id === id)
-    if (index === -1) {
-      throw boom.notFound("Not found")
-    }
+    if (index === -1) throw boom.notFound("Not found")
     const user = this.users[index]
     this.users[index] = {
       ...user,
@@ -49,11 +50,9 @@ class UsersService {
     return this.users[index]
   }
 
-  delete(id) {
+  async delete(id) {
     const index = this.users.findIndex((item) => item.id === id)
-    if (index === -1) {
-      throw boom.notFound("Not found")
-    }
+    if (index === -1) throw boom.notFound("Not found")
     this.users.splice(index, 1)
     return { id }
   }
