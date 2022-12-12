@@ -5,9 +5,12 @@ const router = express.Router()
 const service = new UsersService()
 
 router.get("/", async (req, res) => {
-  const users = await service.find()
-
-  res.json(users)
+  try {
+    const users = await service.find()
+    res.json(users)
+  } catch (error) {
+    next(error)
+  }
 })
 
 router.get("/:id", async (req, res, next) => {
