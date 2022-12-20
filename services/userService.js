@@ -1,63 +1,50 @@
-const faker = require("faker")
+// const faker = require("faker")
 const boom = require("@hapi/boom")
-const getConnection = require("../libs/postgres")
+const { models } = require("../libs/sequelize")
 
 class UsersService {
   constructor() {
-    ;(this.users = []), this.generate()
+    ;(this.users = [])
   }
 
-  generate() {
-    const limit = 100
+  // generate() {
+  //   const limit = 100
 
-    for (let i = 0; i < limit; i++) {
-      this.users.push({
-        id: faker.datatype.uuid(),
-        name: faker.name.firstName(),
-        lastName: faker.name.lastName(),
-        job: faker.name.jobArea(),
-      })
-    }
-  }
+  //   for (let i = 0; i < limit; i++) {
+  //     this.users.push({
+  //       id: faker.datatype.uuid(),
+  //       name: faker.name.firstName(),
+  //       lastName: faker.name.lastName(),
+  //       job: faker.name.jobArea(),
+  //     })
+  //   }
+  // }
 
   async create(data) {
-    const newUser = {
-      id: faker.datatype.uuid(),
-      ...data,
-    }
-    this.users.push(newUser)
+    const newUser = await models.User.create(data)
     return newUser
   }
 
   async find() {
-    const client = await getConnection()
-    const rta = await client.query('SELECT * FROM tasks')
-    return rta.rows
-    // return this.users
+    const rta = await models.User.findAll()
+    return rta
   }
 
   async findOne(id) {
-    const user = this.users.find((item) => item.id === id)
-    if (!user) throw boom.notFound("Not found")
-    if (user.isBlock) throw boom.conflict("User blocked")
+    const user = await models.User.findByPk(id)
+    if (!user) throw boom.notFound("User not found")
     return user
   }
 
   async update(id, changes) {
-    const index = this.users.findIndex((item) => item.id === id)
-    if (index === -1) throw boom.notFound("Not found")
-    const user = this.users[index]
-    this.users[index] = {
-      ...user,
-      ...changes,
-    }
-    return this.users[index]
+    const user = await this.findOne(id)
+    const rta = await user.update(changes)
+    return rta
   }
 
   async delete(id) {
-    const index = this.users.findIndex((item) => item.id === id)
-    if (index === -1) throw boom.notFound("Not found")
-    this.users.splice(index, 1)
+    const user = await this.findOne(id)
+    await user.destroy()
     return { id }
   }
 }
