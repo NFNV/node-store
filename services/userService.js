@@ -3,7 +3,7 @@ const { models } = require("../libs/sequelize")
 
 class UsersService {
   constructor() {
-    ;(this.users = [])
+    this.users = []
   }
 
   async create(data) {
@@ -12,7 +12,9 @@ class UsersService {
   }
 
   async find() {
-    const rta = await models.User.findAll()
+    const rta = await models.User.findAll({
+      include: ["customer"],
+    })
     return rta
   }
 
