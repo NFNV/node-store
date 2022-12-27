@@ -34,7 +34,7 @@ router.get(
 router.post(
   "/",
   validatorHandler(createProductSchema, "body"),
-  async (req, res) => {
+  async (req, res, next) => {
     try {
       const body = req.body
 
