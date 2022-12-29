@@ -1,24 +1,9 @@
 const boom = require("@hapi/boom")
 const { models } = require("../libs/sequelize")
+const { Op } = require("sequelize")
 
 class ProductsService {
-  constructor() {
-    // ;(this.products = []), this.generate()
-  }
-
-  // generate() {
-  //   const limit = 100
-
-  //   for (let i = 0; i < limit; i++) {
-  //     this.products.push({
-  //       id: faker.datatype.uuid(),
-  //       name: faker.commerce.productName(),
-  //       price: parseInt(faker.commerce.price(), 10),
-  //       image: faker.image.imageUrl(),
-  //       isBlock: faker.datatype.boolean(),
-  //     })
-  //   }
-  // }
+  constructor() {}
 
   async create(data) {
     const newProduct = await models.Product.create(data)
@@ -28,10 +13,20 @@ class ProductsService {
   async find(query) {
     const options = {
       include: ["category"],
+      where: {},
     }
-    const { limit, offset } = query
+    const { limit, offset, price, price_min, price_max } = query
     if (limit && offset) {
       ;(options.limit = limit), (options.offset = offset)
+    }
+    if (price) {
+      options.where.price = price
+    }
+    if (price_min && price_max) {
+      options.where.price = {
+        [Op.gte]: price_min,
+        [Op.lte]: price_max,
+      }
     }
     const products = await models.Product.findAll(options)
     return products
