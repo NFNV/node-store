@@ -1,6 +1,7 @@
 const express = require("express")
 // const cors = require("cors")
 const routerApi = require("./routes")
+const { checkApiKey } = require("./middlewares/authHandler")
 const app = express()
 const port = 3000
 const {
@@ -12,7 +13,7 @@ const {
 
 app.use(express.json())
 
-app.get("/", (req, res) => res.send("Hello, world!"))
+app.get("/", checkApiKey, (req, res) => res.send("Hello, world!"))
 
 routerApi(app)
 
