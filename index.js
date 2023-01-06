@@ -13,6 +13,8 @@ const {
 
 app.use(express.json())
 
+require("./utils/auth")
+
 app.get("/", checkApiKey, (req, res) => res.send("Hello, world!"))
 
 routerApi(app)
